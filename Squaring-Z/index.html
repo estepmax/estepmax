@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+		tex2jax: {
+			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+			processEscapes: true
+		}
+	});
+	</script>
+	<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+     <link rel="stylesheet" href="/static/css/style.css">
+     <link href="https://fonts.googleapis.com/css?family=Merriweather|Roboto|Raleway:800|IBM+Plex+Sans:300" rel="stylesheet">
+	
+</head>
+<body>
+	<div class="banner"> 	
+		<div id="recent"> 
+			<h1 id="recent" href="/"> @Statisly </h1> 
+		</div>
+	</div>
+	<div class="container">
+		<div class="navigation">
+		</div>
+	</div>
+
+	<title> Statisly - Squaring Z </title>
+
+	<div class="container">
+	<div class="return">
+		<div id="bread">
+			<ul id="b_ul">
+				<a id="b_ul" href="/"><li id="crumb">Return</li></a>
+			</ul>
+		</div>
+	</div>
+	<h1><div id="title">Squaring Z</div></h1>
+    <p>If $Z \sim N(0,1)$, then $Z^2  \sim \chi_{(1)}^2$</p>
+<p><b>Proof:</b>   $$M_{Z^2}(t)=E(e^{tZ^2}) = \int_{-\infty}^{\infty} e^{tZ^2}\frac{1}{\sqrt{2\pi}}e^{\frac{1}{2}Z^2}dz$$
+$$ \Rightarrow \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}}e^{\frac{1}{2\frac{1}{1-2t}}Z^2}dz = \frac{1}{\sqrt{1-2t}}\int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}\frac{1}{\sqrt{1-2t}}}e^{\frac{1}{2\frac{1}{1-2t}}Z^2}dz = \frac{1}{\sqrt{1-2t}}$$</p>
+<p>Note that what's inside of the integral is simply $N(0,\sqrt{1-2t})$ which integrates to 1. </p>
+<p>Hence, $Z^2 \sim \chi_{(1)}^2$ noting $\frac{1}{1-2t}$ is the moment generating function for $\chi_{(1)}^2$ by definition.   </p>
+    </div>
+
+
+	<div class="footer">
+	</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+		tex2jax: {
+			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+			processEscapes: true
+		}
+	});
+	</script>
+	<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+     <link rel="stylesheet" href="/static/css/style.css">
+     <link href="https://fonts.googleapis.com/css?family=Merriweather|Roboto|Raleway:800|IBM+Plex+Sans:300" rel="stylesheet">
+	
+</head>
+<body>
+	<div class="banner"> 	
+		<div id="recent"> 
+			<h1 id="recent" href="/"> @Statisly </h1> 
+		</div>
+	</div>
+	<div class="container">
+		<div class="navigation">
+		</div>
+	</div>
+
+	<title> Statisly - Metropolis-Hastings Sampler </title>
+
+	<div class="container">
+	<div class="return">
+		<div id="bread">
+			<ul id="b_ul">
+				<a id="b_ul" href="/"><li id="crumb">Return</li></a>
+			</ul>
+		</div>
+	</div>
+	<h1><div id="title">Metropolis-Hastings Sampler</div></h1>
+    <p>Monte-Carlo-Markov-Chain (MCMC) methods are a great way to generate a random sample from a complex distribution using 
+a well-defined prior distribution. Specifically, the Metropolis-Hastings sampler is one of many samplers that can be used
+to generate a random sample when the underlying density is not well-defined. </p>
+<p>Moving on, the sampler has the following form</p>
+<p>$$ \alpha(X_t,Y) = \frac{\pi(Y)q(X_t|Y)}{\pi(X_t)q(Y|X_t)}$$ </p>
+<p>Where $\pi(.)$ is the targeted distribution and $q(.|.)$ is the prior distribution. Note, we might not always have $\pi(.)$, so, 
+we may need to use a kernel density estimate. </p>
+<p>Please be aware that the procedure of constructing the Metropolis-Hastings sampler is similar to the rejection-acceptance sampling procedure.  </p>
+<p>Okay, now that we have the germ of the sampler detailed, we can move move onto an example.</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">ggplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="c1">#we are interested in generating a random sample from a cauchy distribution</span>
+<span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">#we will use a normal distribution to generate a candidate point since it shares </span>
+<span class="c1">#a similar domain as the target distribution</span>
+<span class="k">def</span> <span class="nf">proposal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">sigma</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(((</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)))</span>  
+
+<span class="c1">#initialize x_0, this is the chain we are generating </span>
+<span class="n">chain</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#number of samples to generate</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="c1">#metripolis-hastings sampler </span>
+<span class="k">def</span> <span class="nf">mh_sampler</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">chain</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">K</span> <span class="o">=</span> <span class="n">target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="n">proposal</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">sigma</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">target</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">proposal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">sigma</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="n">K</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">u</span> <span class="o">&lt;=</span> <span class="n">alpha</span><span class="p">:</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1">#generate a chain where proposal distribution has a variance of 4 </span>
+<span class="n">mh_sampler</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+
+<span class="c1">#create dataframe so we can use ggplot</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;x&#39;</span> <span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">)),</span> <span class="s1">&#39;y&#39;</span> <span class="p">:</span> <span class="n">chain</span><span class="p">}</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1">#plot mcmc chain</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">),</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">geom_line</span><span class="p">()</span> <span class="o">+</span> \
+        <span class="n">ggtitle</span><span class="p">(</span><span class="s1">&#39;Monte Carlo Markov Chain&#39;</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">xlab</span><span class="p">(</span><span class="s2">&quot;Candidates&quot;</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">ylab</span><span class="p">(</span><span class="s2">&quot;Generated Chain&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</pre></div>
+
+
+<div id=embed>
+<img id="embedded" src="../static/images/mcmc_mh_chain.png" alt="mcmc-chain">
+</div>
+    </div>
+
+
+	<div class="footer">
+	</div>
+</body>
+</html>

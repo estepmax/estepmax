@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<title> Statisly - {{ page.title }} </title>
+
+	<div class="container">
+	<div class="return">
+		<div id="bread">
+			<ul id="b_ul">
+				<a id="b_ul" href="{{ url_for("index") }}"><li id="crumb">Return</li></a>
+			</ul>
+		</div>
+	</div>
+	<h1><div id="title">{{ page.title }}</div></h1>
+    {{ page }}
+    </div>
+
+{% endblock content %}

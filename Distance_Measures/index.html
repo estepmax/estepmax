@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+		tex2jax: {
+			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+			processEscapes: true
+		}
+	});
+	</script>
+	<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+     <link rel="stylesheet" href="/static/css/style.css">
+     <link href="https://fonts.googleapis.com/css?family=Merriweather|Roboto|Raleway:800|IBM+Plex+Sans:300" rel="stylesheet">
+	
+</head>
+<body>
+	<div class="banner"> 	
+		<div id="recent"> 
+			<h1 id="recent" href="/"> @Statisly </h1> 
+		</div>
+	</div>
+	<div class="container">
+		<div class="navigation">
+		</div>
+	</div>
+
+	<title> Statisly - Distance Measures </title>
+
+	<div class="container">
+	<div class="return">
+		<div id="bread">
+			<ul id="b_ul">
+				<a id="b_ul" href="/"><li id="crumb">Return</li></a>
+			</ul>
+		</div>
+	</div>
+	<h1><div id="title">Distance Measures</div></h1>
+    <h2>Cosine Similarity</h2>
+<p>This measure in particular is based off of the Euclidian dot product which calculates the angle between two vectors: $$cos(\theta)=\dfrac{A\cdot{B}}{\|A \| \|B\|} \Leftrightarrow \dfrac{\sum_{i=1}^n A_{i}B_{i}}{\sqrt{\sum_{i=1}^n A_{i}}\sqrt{\sum_{i=1}^n B_{i}}}$$ </p>
+<p>Suppose we are given the two following sentences: <b> The dog jumps over the high fence </b> and  <b> The cat runs to the fence </b>. Now, we want to figure out the similarity between these two sentences. One slight change we need to make in order
+to use the cosine similarity measure for strings is to create "word vectors" out of the words in our corpus of text. </p>
+<div class="codehilite"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="s1">&#39;The dog jumps over the fence&#39;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">B</span> <span class="o">=</span> <span class="s1">&#39;The cat runs up to the fence&#39;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+<span class="n">A</span><span class="p">,</span><span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span><span class="n">B</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="c1">#split sentences into word vectors</span>
+
+<span class="n">word_basis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">B</span><span class="p">))</span> <span class="c1">#get union of both word vectors</span>
+
+<span class="c1">#get word count from each sentence and downcast into a dictionary</span>
+<span class="n">A_freq</span> <span class="o">=</span> <span class="p">[{</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">A</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">))}][</span><span class="mi">0</span><span class="p">]</span> 
+<span class="n">B_freq</span> <span class="o">=</span> <span class="p">[{</span><span class="n">B</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span><span class="n">B</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">))}][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">word_freq</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_freq</span><span class="p">,</span><span class="n">B_freq</span><span class="p">]</span>
+
+<span class="n">corpus_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="c1">#corpus dictionary</span>
+<span class="n">freq_collection</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#temporary location </span>
+
+
+<span class="c1">#this section of code is used to create a corpus dictionary based on </span>
+<span class="c1">#a collection of sentences</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">word_basis</span><span class="p">)):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">word_basis</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">word_freq</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">word_freq</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">freq_collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word_freq</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freq_collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">corpus_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">freq_collection</span>
+    <span class="n">freq_collection</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#clear each pass</span>
+</pre></div>
+
+
+<p>The above code is just preprocessing, now onto calculating a value.</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span> <span class="c1">#for decimal precision</span>
+
+<span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">corpus_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="c1">#recasting as a numpy array </span>
+
+<span class="n">dot_product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">K</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">K</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#dot product of both counts</span>
+<span class="n">sum_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">K</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#sum of squares for sentence A</span>
+<span class="n">sum_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">K</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#sum of squares for sentence B</span>
+
+<span class="n">cos_similarity</span> <span class="o">=</span> <span class="n">dot_product</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sum_A</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sum_B</span><span class="p">))</span> 
+
+<span class="n">cos_similarity</span>  <span class="c1">#0.58925565098878951</span>
+</pre></div>
+
+
+<h2>Jaccard Similarity</h2>
+<p>The Jaccard similarity comes from a set theory point of view which takes on the following form: $$ J(A,B) = \dfrac{|A \cap B|}{|A \cup B|}$$</p>
+<div class="codehilite"><pre><span></span><span class="n">word_basis_int</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">B</span><span class="p">))</span> <span class="c1">#intersection of word vectors</span>
+<span class="n">jaccard_dist</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">word_basis_int</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">word_basis</span><span class="p">)</span>
+<span class="n">jaccard_dist</span> <span class="c1">#0.22222222</span>
+</pre></div>
+
+
+<p>Note that stop words are not taken into consideration in either example, you should take care of them in practice.
+There are plenty of distance measures available to use other than the ones I have implemented - it is up to you 
+to play with and discover. </p>
+<p><b>-M<b></p>
+    </div>
+
+
+	<div class="footer">
+	</div>
+</body>
+</html>

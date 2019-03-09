@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container">
+		
+	{% for page in pages %}
+		{% if not page.unlisted %}
+		<div class="recent_topics">	
+			<div id="rec_top_ul">
+				<ul class="ul_abs">
+					<li id="abstract">
+						<a class="title" href="{{ url_for("page", path=page.path) }}"><h2 id="abstract">{{ page.title }}</h2></a>
+					</li>
+					<p id="abstract">
+					{{ page.abstract }}
+					</p>
+					<span id="date"> {{ page.date|dt }} </span> 
+				</ul>		
+			</div>
+
+		</div>
+		{% endif %}
+	{% endfor %}
+</div>
+{% endblock content %}
